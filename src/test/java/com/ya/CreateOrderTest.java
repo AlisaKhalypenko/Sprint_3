@@ -1,5 +1,6 @@
 package com.ya;
 
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,17 +23,16 @@ public class CreateOrderTest {
     private final String color;
     private final String expected;
 
-    public CreateOrderTest (String color, String expected) {
+    public CreateOrderTest(String color, String expected) {
         this.color = color;
-
         this.expected = expected;
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return  Arrays.asList (new Object[][]  {
+        return Arrays.asList(new Object[][]{
                 {"BLACK", "BLACK"},
-                {"GREY",  "GREY"},
+                {"GREY", "GREY"},
                 {"BLACK, GREY", "BLACK, GREY"},
                 {"", ""},
         });
@@ -45,27 +45,21 @@ public class CreateOrderTest {
                 List.of(color));
     }
 
-        @Test
-        public void orderWasCreatedWithColors() {
-            ValidatableResponse orderCreated = courierClient.orderCreating(order);
-            int statusCode = orderCreated.extract().statusCode();
-            track = orderCreated.extract().path("track");
+    @Test
+    @DisplayName("Order was created with colors")
+    public void orderWasCreatedWithColors() {
+        ValidatableResponse orderCreated = courierClient.orderCreating(order);
+        int statusCode = orderCreated.extract().statusCode();
+        track = orderCreated.extract().path("track");
 
+        assertThat("Order was created", statusCode, equalTo(201));
+        assertThat("Order track is correct", track, is(not(0)));
+    }
 
-            assertThat("Order was created", statusCode, equalTo(201));
-            assertThat("Order track is incorrect", track, is(not(0)));
-
-        }
-
-        @Test
-        public void ordersListRecived() {
-
-            OrdersList ordersList =  courierClient.orderListGetting();
-
-            assertThat(ordersList, is(not(0)));
-
-
-        }
-
-
+    @Test
+    @DisplayName("Orders list has received")
+    public void ordersListReceived() {
+        OrdersList ordersList = courierClient.orderListGetting();
+        assertThat("Order list is correct", ordersList, is(not(0)));
+    }
 }

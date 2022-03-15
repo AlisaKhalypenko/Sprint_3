@@ -1,11 +1,14 @@
 package com.ya;
 
+import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
+
 import static io.restassured.RestAssured.given;
 
 public class CourierClient extends ScooterRestClient{
     private static final String COURIER_PATH = "/api/v1/courier";
 
+    @Step("Courier login")
     public ValidatableResponse login(CourierCredentials credentials){
         return given()
                 .spec(getBaseSpec())
@@ -15,6 +18,7 @@ public class CourierClient extends ScooterRestClient{
                 .then();
     }
 
+    @Step("Courier creating")
     public ValidatableResponse create (Courier courier){
         String courierLogin = courier.getLogin();
         String courierPassword = courier.getPassword();
@@ -32,6 +36,7 @@ public class CourierClient extends ScooterRestClient{
                 .then();
     }
 
+    @Step("Courier deleting")
     public void delete (int courierId){
         given()
                 .spec(getBaseSpec())
@@ -40,6 +45,7 @@ public class CourierClient extends ScooterRestClient{
                 .then();
     }
 
+    @Step("Order creating")
     public ValidatableResponse orderCreating (Order order) {
         return given()
                 .spec(getBaseSpec())
@@ -49,6 +55,7 @@ public class CourierClient extends ScooterRestClient{
                 .then();
     }
 
+    @Step("Order order list getting")
     public OrdersList orderListGetting () {
         return given()
                 .spec(getBaseSpec())

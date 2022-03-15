@@ -15,7 +15,6 @@ public class OrdersList {
         this.pageInfo = pageInfo;
     }
 
-
     public List<Orders> getOrders() {
         return orders;
     }

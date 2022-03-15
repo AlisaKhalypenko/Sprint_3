@@ -1,5 +1,6 @@
 package com.ya;
 
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
@@ -27,6 +28,7 @@ public class CreateCourierTest {
     }
 
     @Test
+    @DisplayName("Courier can be created")
     public void courierCanBeCreated(){
         ValidatableResponse createResponse = courierClient.create(new Courier(courierLogin, courierPassword, courierFirstName));
         int statusCode = createResponse.extract().statusCode();
@@ -34,11 +36,12 @@ public class CreateCourierTest {
         ValidatableResponse loginResponse = courierClient.login(new CourierCredentials(courierLogin, courierPassword));
         courierId = loginResponse.extract().path("id");
 
-        assertThat("Courier created", statusCode, equalTo(201));
-        assertThat(ok, equalTo(true));
+        assertThat("Courier has created", statusCode, equalTo(201));
+        assertThat("State if courier has created", ok, equalTo(true));
     }
 
     @Test
+    @DisplayName("Courier must be unique")
     public void courierMustBeUnique(){
         ValidatableResponse createResponse = courierClient.create(new Courier("courier.login", "courier.password","courier.firstName"));
         ValidatableResponse createResponse1 = courierClient.create(new Courier("courier.login", "courier.password","courier.firstName"));
@@ -46,27 +49,29 @@ public class CreateCourierTest {
         int statusCode = createResponse1.extract().statusCode();
         String message = createResponse1.extract().path("message");
 
-        assertThat("Courier cannot login", statusCode, equalTo(409));
-        assertThat("Courier is incorrect", message, equalTo("Этот логин уже используется"));
+        assertThat("Courier hasn't created", statusCode, equalTo(409));
+        assertThat("Message if cannot create", message, equalTo("Этот логин уже используется"));
     }
 
     @Test
+    @DisplayName("Courier cannot created without password")
     public void courierCannotCreatedWithoutPassword(){
         ValidatableResponse createResponse = courierClient.create(new Courier(courierLogin, "", courierFirstName));
         int statusCode = createResponse.extract().statusCode();
         String message = createResponse.extract().path("message");
 
-        assertThat(statusCode, equalTo(400));
-        assertThat(message, equalTo("Недостаточно данных для создания учетной записи"));
+        assertThat("Courier hasn't created", statusCode, equalTo(400));
+        assertThat("Message if cannot create", message, equalTo("Недостаточно данных для создания учетной записи"));
     }
 
     @Test
+    @DisplayName("Courier cannot created without login")
     public void courierCannotCreatedWithoutLogin(){
         ValidatableResponse createResponse = courierClient.create(new Courier("", courierPassword, courierFirstName));
         int statusCode = createResponse.extract().statusCode();
         String message = createResponse.extract().path("message");
 
-        assertThat(statusCode, equalTo(400));
-        assertThat(message, equalTo("Недостаточно данных для создания учетной записи"));
+        assertThat("Courier hasn't created", statusCode, equalTo(400));
+        assertThat("Message if cannot create", message, equalTo("Недостаточно данных для создания учетной записи"));
     }
 }
