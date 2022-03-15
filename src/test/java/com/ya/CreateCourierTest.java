@@ -1,6 +1,7 @@
 package com.ya;
 
 import io.restassured.response.ValidatableResponse;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,33 +11,28 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class CreateCourierTest {
     CourierClient courierClient;
-    Courier courier;
-//   List<String> couriers = Arrays.asList(courier.login, courier.password,courier.firstName);
     int courierId;
-
-    /*Тут аналогично классу LoginCourierTest все тесты падают. Думаю, проблема та же: некорректно создаю курьера и
-    передаю значения логина и пароля. Помогите разобраться, пожалуйста.
-     */
+    String courierLogin = RandomStringUtils.randomAlphabetic(10);
+    String courierPassword = RandomStringUtils.randomAlphabetic(10);
+    String courierFirstName = RandomStringUtils.randomAlphabetic(10);
 
    @Before
     public void setUp(){
         courierClient = new CourierClient();
-        courier = new Courier("unikalniynyc", "1234", "test");
-
     }
 
     @After
     public void tearDown(){
-        ValidatableResponse loginResponse = courierClient.login(new CourierCredentials(courier.login, courier.password));
-        courierId = loginResponse.extract().path("id");
         courierClient.delete(courierId);
     }
 
     @Test
     public void courierCanBeCreated(){
-        ValidatableResponse createResponse = courierClient.create(new Courier(courier.login, courier.password, courier.firstName));
+        ValidatableResponse createResponse = courierClient.create(new Courier(courierLogin, courierPassword, courierFirstName));
         int statusCode = createResponse.extract().statusCode();
         boolean ok = createResponse.extract().path("ok");
+        ValidatableResponse loginResponse = courierClient.login(new CourierCredentials(courierLogin, courierPassword));
+        courierId = loginResponse.extract().path("id");
 
         assertThat("Courier created", statusCode, equalTo(201));
         assertThat(ok, equalTo(true));
@@ -56,7 +52,7 @@ public class CreateCourierTest {
 
     @Test
     public void courierCannotCreatedWithoutPassword(){
-        ValidatableResponse createResponse = courierClient.create(new Courier(courier.login, "", courier.firstName));
+        ValidatableResponse createResponse = courierClient.create(new Courier(courierLogin, "", courierFirstName));
         int statusCode = createResponse.extract().statusCode();
         String message = createResponse.extract().path("message");
 
@@ -66,7 +62,7 @@ public class CreateCourierTest {
 
     @Test
     public void courierCannotCreatedWithoutLogin(){
-        ValidatableResponse createResponse = courierClient.create(new Courier("", courier.password, courier.firstName));
+        ValidatableResponse createResponse = courierClient.create(new Courier("", courierPassword, courierFirstName));
         int statusCode = createResponse.extract().statusCode();
         String message = createResponse.extract().path("message");
 

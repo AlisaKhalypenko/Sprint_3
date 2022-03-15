@@ -14,16 +14,14 @@ public class LoginCourierTest {
     CourierClient courierClient;
     Courier courier;
     int courierId;
+    String courierLogin = "courierLogin123";
+    String courierPassword = "courierPassword";
+
 
     @Before
     public void setUp(){
         courierClient = new CourierClient();
-        /* Не удалось разобраться с тем, как передать курьеру рандомные значения логина, пароля и имени.
-        Из задания проекта скоприрован код в класс ScooterRegisterCourier, но не понимаю, как его применить?
-        После исполнения метода класса ScooterRegisterCourier должен получиться список значений. Как список
-        передать объекту класса Courier, который принимает 3 значения типа String? Объясните, пожалуйста.*/
-
-        courier = new Courier("unikalniynyc", "1234", "test");
+        courier = new Courier(courierLogin, courierPassword, "courierFirstName");
         courierClient.create(courier);
     }
 
@@ -32,17 +30,15 @@ public class LoginCourierTest {
         courierClient.delete(courierId);
     }
 
-    /*  в этом классе все тесты падают. Курьер создаётся, но не может залогиниться.
-     Код идентичен тому, что давали на вебинаре. Почему так происходит? Чего-то не хватает методу login? Чего именно?*/
-
 
     @Test
     public void courierCanLoginWithValidCredentials(){
         ValidatableResponse loginResponse = courierClient.login(new CourierCredentials(courier.login, courier.password));
         int statusCode = loginResponse.extract().statusCode();
         courierId = loginResponse.extract().path("id");
+
         assertThat("Courier cannot login", statusCode, equalTo(SC_OK));
-        //assertThat("Courier id is incorrect", courierId, is(not(0)));
+        assertThat("Courier id is incorrect", courierId, is(not(0)));
 
     }
 
@@ -88,7 +84,7 @@ public class LoginCourierTest {
 
     @Test
     public void courierCannotLoginIfNotCreated(){
-        ValidatableResponse loginResponse = courierClient.login(new CourierCredentials("test", "test"));
+        ValidatableResponse loginResponse = courierClient.login(new CourierCredentials("stfxjsdrhzr", "test"));
         int statusCode = loginResponse.extract().statusCode();
         String message = loginResponse.extract().path("message");
 
